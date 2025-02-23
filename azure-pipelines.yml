@@ -6,8 +6,8 @@
 trigger:
 - main
 
-pool:
-  vmImage: andarroyave-hostinger
+pool: andarroyave-hostinger
+
 
 variables:
   - group: andarroyave_com
