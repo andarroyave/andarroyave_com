@@ -24,7 +24,7 @@ steps:
     sudo docker stop andarroyave
     sudo docker rm andarroyave
     sudo docker run -d -p 3000:3000 -p 8000:8000 --name andarroyave andarroyave.com:$(version)
-    
+  displayName: 'Deploy docker image'    
 
 
     
