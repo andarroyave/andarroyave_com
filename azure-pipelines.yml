@@ -7,13 +7,24 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: andarroyave-hostinger
 
+variables:
+  - group: andarroyave_com
+  
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    echo Building docker image $(version).
+    sudo docker build -t andarroyave.com:$(version) .
+  displayName: 'Build docker image'
+
+- script: |
+    echo Deploying docker image $(version).
+    sudo docker stop andarroyave
+    sudo docker rm andarroyave
+    sudo docker run -d -p 3000:3000 -p 8000:8000 --name andarroyave andarroyave.com:$(version)
+    
+
+
+    
