@@ -1,21 +1,44 @@
-"""Welcome to Reflex! This file outlines the steps to create a basic app."""
-
 import reflex as rx
 from rxconfig import config
+import datetime
 
 
-# Define the state for managing the selected option and suboption
+SECTIONS = {
+    "home": "Hello Home",
+    "about": "Hello About",
+    "contact": "Hello Contact",
+    "tema1": "Hello Tema 1",
+    "tema2": "Hello Tema 2",
+    "tema3": "Hello Tema 3",
+    "tema4": "Hello Tema 4",
+}
+
+class Content(rx.Base):
+    text: str
+
+class Article(rx.Base):
+    title: str
+    content: Content
+    date: datetime.datetime
+    keywords: list[str]
+
 class State(rx.State):
     '''state'''
+    content: str = "Hello, world!"
+    contents: dict  = SECTIONS
+
+    @rx.event
+    def set_content(self, section: str) -> None:
+        self.content = self.contents[section]
 
 
-def nav_link(text: str, url: str) -> rx.Component:
+def nav_link(text: str, url: str, section: str) -> rx.Component:
     return rx.link(
-        rx.text(text, size="4", weight="medium"), href=url
+        rx.text(text, size="4", weight="medium"), href=url, on_click=State.set_content(section),
     )
 
 # Define the header component with a logo and navbar
-def header():
+def header() -> rx.Component:
     return rx.box(
         rx.desktop_only(
             rx.hstack(
@@ -32,9 +55,9 @@ def header():
                     align_items="center",
                 ),
                 rx.hstack(
-                    nav_link("Home", "/#"),
-                    nav_link("About", "/#"),
-                    nav_link("Contact", "/#"),
+                    nav_link("Home", "/#", "home"), 
+                    nav_link("About", "/#", "about"),
+                    nav_link("Contact", "/#", "contact"),
                     rx.color_mode.button(),
                     justify="end",
                     spacing="5",
@@ -54,7 +77,7 @@ def header():
                         border_radius="25%",
                     ),
                     rx.heading(
-                        "Reflex", size="6", weight="bold"
+                        "andarroyave.com", size="6", weight="bold"
                     ),
                     align_items="center",
                 ),
@@ -75,46 +98,15 @@ def header():
         ),
         #bg=rx.color("accent", 3),
         padding="1em",
-        # position="fixed",
-        # top="0px",
-        # z_index="5",
         width="100%",
     )
-
-
-# Define the sidebar component with dynamic options
-def sidebar_item(
-    text: str, icon: str, href: str
-) -> rx.Component:
-    return rx.link(
-        rx.hstack(
-            rx.icon(icon),
-            rx.text(text, size="4"),
-            width="100%",
-            padding_x="0.5rem",
-            padding_y="0.75rem",
-            align="center",
-            style={
-                "_hover": {
-                    "bg": rx.color("accent", 4),
-                    "color": rx.color("accent", 11),
-                },
-                "border-radius": "0.5em",
-            },
-        ),
-        href=href,
-        underline="none",
-        weight="medium",
-        width="100%",
-    )
-
 
 def sidebar_items() -> rx.Component:
     return rx.vstack(
-        sidebar_item("Dashboard", "layout-dashboard", "/#"),
-        sidebar_item("Projects", "square-library", "/#"),
-        sidebar_item("Analytics", "bar-chart-4", "/#"),
-        sidebar_item("Messages", "mail", "/#"),
+        nav_link("Tema 1", "/#", "tema1"),
+        nav_link("Tema 2", "/#", "tema2"),
+        nav_link("Tema 3", "/#", "tema3"),
+        nav_link("Tema 4", "/#", "tema4"),
         spacing="1",
         width="100%",
     )
@@ -140,51 +132,50 @@ def sidebar() -> rx.Component:
             ),
         ),
         rx.mobile_and_tablet(
-            rx.drawer.root(
-                rx.drawer.trigger(
-                    rx.icon("align-justify", size=30)
+            rx.vstack(
+                rx.input(
+                    rx.input.slot(rx.icon("search")),
+                    placeholder="Search...",
+                    type="search",
+                    size="2",
+                    justify="end",
+                    padding_x="1em",
                 ),
-                rx.drawer.overlay(z_index="5"),
-                rx.drawer.portal(
-                    rx.drawer.content(
-                        rx.vstack(
-                            rx.box(
-                                rx.drawer.close(
-                                    rx.icon("x", size=30)
-                                ),
-                                width="100%",
-                            ),
-                            sidebar_items(),
-                            spacing="5",
-                            width="100%",
-                        ),
-                        top="auto",
-                        right="auto",
-                        height="100%",
-                        width="20em",
-                        padding="1.5em",
-                        #bg=rx.color("accent", 2),
-                    ),
-                    width="100%",
-                ),
-                direction="left",
+                align_items="center",
+                padding_x="1em",
             ),
-            padding="1em",
         ),
     )
 
 
 # Define the main content component with dynamic content
-def main_content():
+def main_content() -> rx.Component:
     return rx.box(
         rx.vstack(
-            rx.text("lorem ipsum", font_size="xl"),
+            rx.text(State.content, font_size="xl"),
             rx.image(src="../assets/favicon.ico", alt="Placeholder image"),
             padding="2rem",
         ),
         width="80%",
     )
 
+def footer() -> rx.Component:
+    return rx.box(
+        rx.vstack(
+            rx.text(
+                "© 2025 andarroyave.com",
+                size="3",
+                white_space="nowrap",
+                weight="medium",
+            ),
+            rx.logo(),
+            align_items="center",
+            justify="center",
+            width="100%",
+        ),
+        align_items="between",
+        width="100%",
+    )
 
 # Define the main page layout
 def index():
@@ -197,7 +188,7 @@ def index():
             width="100%",
             height="calc(100vh - 4rem)",  # Full height minus header height
         ),
-        rx.logo(),
+        footer(),
         
         spacing="0",
         
