@@ -34,7 +34,7 @@ class State(rx.State):
 
 def nav_link(text: str, url: str, section: str) -> rx.Component:
     return rx.link(
-        rx.text(text, size="4", weight="medium"), href=url, on_click=State.set_content(section),
+        rx.text(text, size="4", weight="medium"), href=url, on_click=State.set_content(section).prevent_default,
     )
 
 # Define the header component with a logo and navbar
